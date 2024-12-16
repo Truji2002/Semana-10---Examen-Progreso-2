@@ -1,0 +1,152 @@
+REST API - Gestión de Reservas
+Descripción
+Este servicio REST permite gestionar las reservas de habitaciones, proporcionando las siguientes funcionalidades:
+
+Crear una reserva (POST /reservations).
+Consultar una reserva específica (GET /reservations/{id}).
+Cancelar una reserva (DELETE /reservations/{id}).
+Requisitos Previos
+Antes de ejecutar el servicio, asegúrate de tener instaladas las siguientes herramientas:
+
+Python 3.x
+PostgreSQL configurado con la base de datos rest_api_db
+Dependencias instaladas mediante pip
+Instalación
+Clona el repositorio del proyecto:
+
+
+git clone https://github.com/Truji2002/Semana-10---Examen-Progreso-2.git
+cd rest-api-service
+Crea y activa el entorno virtual:
+
+
+python -m venv venv
+source venv/bin/activate      # En Linux/Mac
+venv\Scripts\activate         # En Windows
+Instala las dependencias:
+
+pip install requirements.txt
+Configura la base de datos: Accede a PostgreSQL y ejecuta el siguiente script SQL para crear la base de datos y la tabla reservations:
+
+
+CREATE DATABASE rest_api_db;
+
+\c rest_api_db
+
+CREATE TABLE reservations (
+    reservation_id SERIAL PRIMARY KEY,
+    room_number INTEGER NOT NULL,
+    customer_name VARCHAR(100) NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    status VARCHAR(20) NOT NULL
+);
+Ejecución del Servicio
+Asegúrate de estar en el directorio principal del proyecto y de que el entorno virtual esté activado.
+
+Ejecuta el servidor Flask:
+
+
+python app/rest_service.py
+El servicio estará disponible en:
+
+
+http://localhost:5000
+Estructura del Proyecto
+
+rest-api-service/
+├── app/
+│   ├── rest_service.py      # Archivo principal del servicio REST
+│   ├── database.py          # Configuración de la base de datos
+├── venv/                    # Entorno virtual
+└── README.md                # Archivo actual
+Uso del REST API
+1. Crear una Reserva (POST /reservations)
+Método: POST
+URL: http://localhost:5000/reservations
+Headers:
+Content-Type: application/json
+Body:
+json
+
+{
+    "room_type": "Single",
+    "start_date": "2024-12-20",
+    "end_date": "2024-12-21",
+    "customer_name": "John Doe"
+}
+Respuesta Exitosa:
+
+json
+
+{
+    "message": "Reservation created successfully",
+    "reservation_id": 1,
+    "room_number": 101
+}
+2. Consultar una Reserva (GET /reservations/{id})
+Método: GET
+URL: http://localhost:5000/reservations/1
+Respuesta Exitosa:
+
+json
+
+{
+    "reservation_id": 1,
+    "room_number": 101,
+    "customer_name": "John Doe",
+    "start_date": "2024-12-20",
+    "end_date": "2024-12-21",
+    "status": "Confirmed"
+}
+Si la reserva no existe:
+
+json
+
+{
+    "error": "Reservation not found"
+}
+3. Cancelar una Reserva (DELETE /reservations/{id})
+Método: DELETE
+URL: http://localhost:5000/reservations/1
+Respuesta Exitosa:
+
+json
+
+{
+    "message": "Reservation cancelled successfully"
+}
+Si la reserva no existe:
+
+json
+
+{
+    "error": "Reservation not found"
+}
+Pruebas con Postman
+Crea una Nueva Solicitud en Postman:
+
+POST: http://localhost:5000/reservations
+Agrega el body JSON para crear una reserva.
+Consulta una Reserva:
+
+GET: http://localhost:5000/reservations/1
+(Reemplaza 1 por el ID de la reserva).
+Cancela una Reserva:
+
+DELETE: http://localhost:5000/reservations/1
+Errores Comunes
+Base de datos no conectada:
+
+Verifica la conexión en el archivo database.py.
+Puerto ocupado:
+
+Cambia el puerto en rest_service.py:
+python
+
+app.run(port=5001, debug=True)
+Habitaciones ya reservadas:
+
+Prueba con un rango de fechas diferentes.
+Contacto
+Si tienes algún problema, puedes contactarme

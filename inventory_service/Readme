@@ -1,0 +1,173 @@
+Microservicio de Gestión de Inventario
+Descripción
+Este microservicio permite gestionar el inventario de habitaciones de un hotel. Proporciona las siguientes funcionalidades:
+
+Registrar nuevas habitaciones: POST /rooms
+Actualizar el estado de una habitación: PATCH /rooms/{id}
+Requisitos Previos
+Antes de ejecutar el servicio, asegúrate de tener instaladas las siguientes herramientas:
+
+Python 3.x
+PostgreSQL configurado con la base de datos inventory_service_db
+Dependencias instaladas mediante pip
+Instalación
+Clona el repositorio del proyecto:
+
+
+git clone https://github.com/Truji2002/Semana-10---Examen-Progreso-2.git
+cd inventory-service
+Crea y activa el entorno virtual:
+
+
+python -m venv venv
+source venv/bin/activate      # En Linux/Mac
+venv\Scripts\activate         # En Windows
+Instala las dependencias:
+
+
+pip install flask flask-sqlalchemy psycopg2
+Configura la base de datos: Accede a PostgreSQL y ejecuta el siguiente script SQL para crear la base de datos y la tabla rooms:
+
+
+CREATE DATABASE inventory_service_db;
+
+\c inventory_service_db
+
+CREATE TABLE rooms (
+    room_id SERIAL PRIMARY KEY,
+    room_number INTEGER NOT NULL UNIQUE,
+    room_type VARCHAR(50) NOT NULL,
+    status VARCHAR(20) NOT NULL
+);
+
+-- Datos iniciales opcionales
+INSERT INTO rooms (room_number, room_type, status) VALUES
+(101, 'Single', 'Available'),
+(102, 'Double', 'Available');
+Ejecución del Servicio
+Asegúrate de estar en el directorio principal del proyecto y de que el entorno virtual esté activado.
+
+Ejecuta el servidor Flask:
+
+
+python app/inventory_service.py
+El servicio estará disponible en:
+
+
+http://localhost:5001
+Estructura del Proyecto
+
+inventory-service/
+├── app/
+│   ├── inventory_service.py    # Archivo principal del microservicio
+│   ├── database.py             # Configuración de la base de datos
+├── venv/                       # Entorno virtual
+└── README.md                   # Archivo actual
+Uso del Microservicio
+1. Registrar una Nueva Habitación (POST /rooms)
+Método: POST
+URL: http://localhost:5001/rooms
+Headers:
+Content-Type: application/json
+Body:
+json
+
+{
+    "room_number": 103,
+    "room_type": "Suite",
+    "status": "Available"
+}
+Respuesta Exitosa:
+
+json
+
+{
+    "message": "Room created successfully",
+    "room": {
+        "room_id": 3,
+        "room_number": 103,
+        "room_type": "Suite",
+        "status": "Available"
+    }
+}
+Si la habitación ya existe:
+
+json
+
+{
+    "error": "Room already exists"
+}
+2. Actualizar el Estado de una Habitación (PATCH /rooms/{id})
+Método: PATCH
+URL: http://localhost:5001/rooms/1
+(Reemplaza 1 con el ID de la habitación).
+Headers:
+Content-Type: application/json
+Body:
+json
+
+{
+    "status": "Maintenance"
+}
+Respuesta Exitosa:
+
+json
+
+{
+    "message": "Room status updated successfully",
+    "room": {
+        "room_id": 1,
+        "room_number": 101,
+        "room_type": "Single",
+        "status": "Maintenance"
+    }
+}
+Si la habitación no existe:
+
+json
+
+{
+    "error": "Room not found"
+}
+Pruebas con Postman
+Registrar una Nueva Habitación:
+
+Método: POST
+URL: http://localhost:5001/rooms
+Body:
+json
+
+{
+    "room_number": 104,
+    "room_type": "Double",
+    "status": "Available"
+}
+Actualizar el Estado de una Habitación:
+
+Método: PATCH
+URL: http://localhost:5001/rooms/1
+Body:
+json
+
+{
+    "status": "Maintenance"
+}
+Prueba con IDs no existentes:
+
+PATCH a http://localhost:5001/rooms/999
+Debe devolver el error: "Room not found".
+Errores Comunes
+Base de datos no conectada:
+
+Verifica la configuración en el archivo database.py.
+Puerto ocupado:
+
+Cambia el puerto en el archivo inventory_service.py:
+python
+
+app.run(port=5002, debug=True)
+Datos duplicados:
+
+Asegúrate de que el campo room_number sea único.
+Contacto
+Si tienes algún problema, puedes contactarme 

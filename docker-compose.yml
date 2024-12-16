@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 9060
+      POSTGRES_DB: shared_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  soap_service:
+    build:
+      context: ./soap_service
+    container_name: soap_service
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/shared_db
+    depends_on:
+      - postgres
+
+  rest_api:
+    build:
+      context: ./rest_api
+    container_name: rest_api
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/shared_db
+    depends_on:
+      - postgres
+      - soap_service
+
+  inventory_service:
+    build:
+      context: ./inventory_service
+    container_name: inventory_service
+    ports:
+      - "5001:5001"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/shared_db
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:

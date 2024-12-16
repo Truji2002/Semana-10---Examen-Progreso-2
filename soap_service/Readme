@@ -1,0 +1,127 @@
+Servicio SOAP - Consulta de Disponibilidad de Habitaciones
+Descripción
+Este servicio SOAP permite consultar la disponibilidad de habitaciones por tipo, rango de fechas y estado en un sistema de gestión de reservas de una cadena hotelera.
+
+Requisitos Previos
+Antes de ejecutar el servicio, asegúrate de tener instaladas las siguientes herramientas:
+
+Python 3.x
+PostgreSQL configurado con la base de datos soap_service_db
+Dependencias de Python instaladas mediante pip
+Instalación
+Clona el repositorio del proyecto:
+
+
+
+git clone https://github.com/Truji2002/Semana-10---Examen-Progreso-2.git
+cd soap-service
+Crea y activa el entorno virtual:
+
+
+
+python -m venv venv
+source venv/bin/activate      # En Linux/Mac
+venv\Scripts\activate         # En Windows
+Instala las dependencias:
+
+
+pip install requirements.txt
+Configura la base de datos:
+
+Accede a PostgreSQL y ejecuta el siguiente script SQL para crear la tabla availability:
+sql
+
+CREATE DATABASE soap_service_db;
+
+\c soap_service_db
+
+CREATE TABLE availability (
+    room_id SERIAL PRIMARY KEY,
+    room_type VARCHAR(50) NOT NULL,
+    available_date DATE NOT NULL,
+    status VARCHAR(20) NOT NULL
+);
+
+INSERT INTO availability (room_type, available_date, status) VALUES
+('Single', '2024-12-20', 'Available'),
+('Single', '2024-12-21', 'Available'),
+('Double', '2024-12-20', 'Available');
+Ejecución del Servicio
+Asegúrate de estar en el directorio principal del proyecto y de que el entorno virtual esté activado.
+
+Ejecuta el servidor Flask:
+
+
+python app/soap_service.py
+El servicio SOAP estará disponible en:
+
+arduino
+
+http://localhost:8000
+Estructura del Proyecto
+plaintext
+
+soap-service/
+├── app/
+│   ├── soap_service.py     # Archivo principal del servicio SOAP
+│   ├── database.py         # Configuración de la base de datos
+├── venv/                   # Entorno virtual
+└── README.md               # Archivo actual
+Uso del Servicio SOAP
+Solicitud: Consulta de Disponibilidad
+Método: POST
+URL: http://localhost:8000
+Headers:
+Content-Type: text/xml
+Body (XML):
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <checkAvailability>
+         <start_date>2024-12-20</start_date>
+         <end_date>2024-12-21</end_date>
+         <room_type>Single</room_type>
+      </checkAvailability>
+   </soapenv:Body>
+</soapenv:Envelope>
+Respuesta Exitosa:
+
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+   <soap:Body>
+      <checkAvailabilityResponse>
+         <Room>
+            <RoomID>1</RoomID>
+            <Status>Available</Status>
+         </Room>
+         <Room>
+            <RoomID>2</RoomID>
+            <Status>Available</Status>
+         </Room>
+      </checkAvailabilityResponse>
+   </soap:Body>
+</soap:Envelope>
+Respuesta Sin Disponibilidad:
+
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+   <soap:Body>
+      <checkAvailabilityResponse>
+         <Message>No rooms available</Message>
+      </checkAvailabilityResponse>
+   </soap:Body>
+</soap:Envelope>
+Pruebas con Postman
+Crea una nueva solicitud en Postman.
+Configura el método POST y la URL: http://localhost:8000.
+Configura el encabezado Content-Type: text/xml.
+Pega el XML de solicitud en el Body.
+Envía la solicitud y verifica la respuesta.
+Errores Comunes
+Base de datos no conectada:
+Verifica la conexión en database.py.
+Puerto ocupado:
+Cambia el puerto en el archivo principal a uno libre, por ejemplo:
+
+app.run(port=8001, debug=True)
+Contacto
+Si tienes algún problema, no dudes en contactarme.
